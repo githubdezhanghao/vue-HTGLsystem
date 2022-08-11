@@ -1,29 +1,56 @@
-import Vue from 'vue'
-import VueRouter from 'vue-router'
-import HomeView from '../views/HomeView.vue'
-
-Vue.use(VueRouter)
-
+import Vue from "vue";
+import VueRouter from "vue-router";
+import Main from '../views/Main'
+Vue.use(VueRouter);
+//解决多次点击首页报错BUG  原理未知
+const originalPush = VueRouter.prototype.push
+VueRouter.prototype.push = function push(location){
+  return originalPush.call(this,location).catch(err => err)
+}
 const routes = [
   {
-    path: '/',
-    name: 'home',
-    component: HomeView
+    path: "/",
+    redirect:'/home',
+    component:Main,
+    children:[
+      {
+        path:'/home',
+        name:'home',
+        component:()=>import('../views/home/home.vue')
+      },
+      {
+        path:'/user',
+        name:'user',
+        component:()=>import('../views/user/user.vue')
+      },
+      {
+        path:'/mall',
+        name:'mall',
+        component:()=>import('../views/mall/mall.vue')
+      },
+      {
+        path:'/page1',
+        name:'page1',
+        component:()=>import('../views/other/pageOne.vue')
+      },
+      {
+        path:'/page2',
+        name:'page2',
+        component:()=>import('../views/other/pageTwo.vue')
+      }
+    ]
   },
   {
-    path: '/about',
-    name: 'about',
-    // route level code-splitting
-    // this generates a separate chunk (about.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
-    component: () => import(/* webpackChunkName: "about" */ '../views/AboutView.vue')
+    path:'/login',
+    name:'login',
+    component:()=>import('../views/login/login.vue')
   }
-]
+];
 
 const router = new VueRouter({
-  mode: 'history',
+  mode: "history",
   base: process.env.BASE_URL,
-  routes
-})
+  routes,
+});
 
-export default router
+export default router;
